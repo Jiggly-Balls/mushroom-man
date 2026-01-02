@@ -3,16 +3,17 @@ from __future__ import annotations
 from enum import StrEnum, auto
 from typing import TYPE_CHECKING, overload
 
-import sqlalchemy
-from backend.base_db import BaseData
-from backend.tables import User
 from sqlalchemy import select, update
+from sqlalchemy.exc import IntegrityError
+
+from mushroom_man.backend.base_db import BaseData
+from mushroom_man.backend.tables import User
 
 if TYPE_CHECKING:
     from typing import Any, Literal
 
 
-class UserAspect(StrEnum):
+class UserTrait(StrEnum):
     level = auto()
     exp = auto()
     wallet = auto()
@@ -29,7 +30,7 @@ class UserDB(BaseData):
                 async with session.begin():
                     session.add(User(id=self.id))
                     return True
-            except sqlalchemy.exc.IntegrityError:
+            except IntegrityError:
                 return False
 
     @staticmethod
@@ -59,7 +60,7 @@ class UserDB(BaseData):
                 return None
             return data[0]
 
-    async def update_aspect(self, key: UserAspect, value: Any) -> None:
+    async def update_trait(self, key: UserTrait, value: Any) -> None:
         async with BaseData.session_factory() as session:
             payload: dict[str, Any] = {str(key): value}
 
@@ -72,9 +73,9 @@ class UserDB(BaseData):
             await session.execute(update_user_query)
             await session.commit()
 
-    async def increment_aspect(self, key: UserAspect, value: int = 1) -> None:
+    async def increment_trait(self, key: UserTrait, value: int = 1) -> None:
         user = await self.get_account()
         final_val = user.__dict__[key] + value
-        await self.update_aspect(key=key, value=final_val)
+        await self.update_trait(key=key, value=final_val)
 
     async def delete_account(self) -> Any: ...

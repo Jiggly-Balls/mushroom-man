@@ -15,6 +15,6 @@ class User(BaseTable):
     id = Column(BigInteger, primary_key=True)
     level = Column(Integer, default=0)
     exp = Column(Integer, default=0)
-    wallet = Column(Integer, default=1000)
+    mushrooms = Column(Integer, default=1000)
     bank = Column(Integer, default=0)
     net_worth = Column(Integer, default=1000)

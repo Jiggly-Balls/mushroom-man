@@ -3,9 +3,10 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, final
 
 import discord
-from data.games.mine import Direction, MineEngine
 from disckit.utils import ErrorEmbed
 from disckit.utils.ui import BaseView
+
+from mushroom_man.data.games.mine import Direction, MineEngine
 
 if TYPE_CHECKING:
     from discord import Interaction

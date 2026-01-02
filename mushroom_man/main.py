@@ -17,7 +17,6 @@ __copyright__ = "Copyright 2026-present Jiggly Balls"
 import asyncio
 import datetime
 import logging
-import os
 
 import asyncpg
 import discord
@@ -29,11 +28,11 @@ from mushroom_man.backend.base_db import BaseData
 from mushroom_man.backend.cache import Cache
 from mushroom_man.backend.tables import BaseTable
 from mushroom_man.core.bot import Bot
-from mushroom_man.data.constants.core import EXTENSION_DIRECTORY
+from mushroom_man.data.constants.core import EXTENSIONS
 
 ENV = dotenv.dotenv_values(".env")
-TOKEN = ENV["TOKEN"]
-CONNECTION_STRING = ENV["CONNECTION_STRING"]
+TOKEN = ENV["BOT_TOKEN"]
+CONNECTION_STRING = None  # ENV["CONNECTION_STRING"]
 intents = discord.Intents(guilds=True, members=True)
 
 
@@ -52,7 +51,7 @@ setup_logging()
 logger = logging.getLogger()
 
 
-async def load_extensions(*, bot: Bot, directory: str) -> None:
+async def load_extensions(*, bot: Bot, directory: set[str]) -> None:
     """Loads all the extensions from the supplied directory.
 
     Parameters
@@ -60,22 +59,15 @@ async def load_extensions(*, bot: Bot, directory: str) -> None:
     directory
         The directory containing the cogs.
     """
-    parent = directory.split("/")[1]
-
-    for folder in os.listdir(directory):
-        for cog in os.listdir(directory + "/" + folder):
-            if cog.endswith(".py"):
-                cog_path = (
-                    parent.replace("/", ".") + "." + folder + "." + cog[:-3]
-                )
-                await bot.load_extension(cog_path)
-                logging.info(f"Loading Extension: {cog_path}")
+    for extension in directory:
+        await bot.load_extension(extension)
+        logging.info(f"Loading Extension: {extension}")
 
 
 async def main() -> None:
     try:
         if CONNECTION_STRING is None:
-            raise RuntimeError(
+            logger.error(
                 "No 'CONNECTION_STRING' was provided in the .env file"
             )
 
@@ -83,19 +75,20 @@ async def main() -> None:
             raise RuntimeError("No 'TOKEN' was provided in the .env file")
 
         bot = Bot(intents=intents)
-        try:
-            BaseData.db_engine = create_async_engine(
-                CONNECTION_STRING, pool_pre_ping=True
-            )
-            BaseData.session_factory = async_sessionmaker(
-                BaseData.db_engine, expire_on_commit=True
-            )
-            async with BaseData.db_engine.begin() as conn:
-                await conn.run_sync(BaseTable.metadata.create_all)
-        except asyncpg.InternalServerError as error:
-            logger.warning("Couldn't connect to database : %s", str(error))
+        if CONNECTION_STRING is not None:
+            try:
+                BaseData.db_engine = create_async_engine(
+                    CONNECTION_STRING, pool_pre_ping=True
+                )
+                BaseData.session_factory = async_sessionmaker(
+                    BaseData.db_engine, expire_on_commit=True
+                )
+                async with BaseData.db_engine.begin() as conn:
+                    await conn.run_sync(BaseTable.metadata.create_all)
+            except asyncpg.InternalServerError as error:
+                logger.warning("Couldn't connect to database : %s", str(error))
 
-        await load_extensions(bot=bot, directory=EXTENSION_DIRECTORY)
+        await load_extensions(bot=bot, directory=EXTENSIONS)
         Cache.uptime = f"<t:{round(datetime.datetime.now().timestamp())}:R>"
         await bot.start(TOKEN)
 

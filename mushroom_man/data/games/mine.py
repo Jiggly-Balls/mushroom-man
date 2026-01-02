@@ -12,14 +12,14 @@ class Direction(Enum):
 
 
 class MineAssets(StrEnum):
-    PLAYER = "<:player:1367933647071481927>"
-    EMPTY = "<:empty:1367923622567481492>"
-    STONE = "<:stone:1367923699755257866>"
-    COBBLESTONE = "<:cobblestone:1367923579018154044>"
-    COAL = "<:coal:1367923490069549066>"
-    IRON = "<:iron:1367923677403807906>"
-    GOLD = "<:gold:1367923658538090576>"
-    DIAMOND = "<:diamond:1367923600958423052>"
+    PLAYER = "<:player:1456646549697200251>"
+    EMPTY = "<:empty:1456645997668204683>"
+    STONE = "<:stone:1456646075388657725>"
+    COBBLESTONE = "<:cobblestone:1456645975572742226>"
+    COAL = "<:coal:1456645900767072320>"
+    IRON = "<:iron:1456646173086711819>"
+    GOLD = "<:gold:1456646041607868519>"
+    DIAMOND = "<:diamond:1456646021445587189>"
 
 
 class MineRates(IntEnum):
@@ -35,7 +35,7 @@ class MineRates(IntEnum):
 def asset_rate_bind() -> tuple[list[MineAssets], list[int]]:
     names: list[MineAssets] = []
     rates: list[int] = []
-    asset_map: dict[str, MineAssets] = MineAssets._member_map_  # type:ignore - VSCode pylance bug
+    asset_map: dict[str, MineAssets] = MineAssets._member_map_  # pyright: ignore[reportAssignmentType]
 
     for name, rate in MineRates._member_map_.items():
         names.append(asset_map[name])

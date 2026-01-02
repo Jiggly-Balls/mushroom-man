@@ -2,7 +2,7 @@ from typing import Any, final
 
 
 class DBException(Exception):
-    """Base class of the database exceptions."""
+    """Base class of the mushroom man database exceptions."""
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)

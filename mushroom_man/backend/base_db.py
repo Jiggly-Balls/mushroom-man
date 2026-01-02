@@ -4,9 +4,10 @@ import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
 
-from backend.errors import DBConnectionException
 from discord.utils import MISSING
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from mushroom_man.backend.errors import DBConnectionException
 
 if TYPE_CHECKING:
     from typing import Self
@@ -62,10 +63,10 @@ class BaseData(ABC):
     async def get_account(self) -> Any: ...
 
     @abstractmethod
-    async def update_aspect(self, key: Any, value: Any) -> Any: ...
+    async def update_trait(self, key: Any, value: Any) -> Any: ...
 
     @abstractmethod
-    async def increment_aspect(self, key: Any, value: int) -> Any: ...
+    async def increment_trait(self, key: Any, value: int) -> Any: ...
 
     @abstractmethod
     async def delete_account(self) -> Any: ...
