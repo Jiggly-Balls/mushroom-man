@@ -8,7 +8,7 @@ A Mushroom Man discord bot.
 :license: MIT License, see LICENSE for more details.
 """
 
-__title__ = "Nivara RPG"
+__title__ = "Mushroom Man"
 __author__ = "Jiggly Balls"
 __license__ = "MIT License"
 __copyright__ = "Copyright 2026-present Jiggly Balls"
